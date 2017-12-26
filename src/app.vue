@@ -1,6 +1,8 @@
 <template>
     <div id="main" class="app-main">
-        <router-view></router-view>
+        <keep-alive>
+            <router-view></router-view>
+        </keep-alive>
     </div>
 </template>
 
@@ -12,15 +14,20 @@
         beforeDestroy () {
 
         },
-        methods: {
-
-        }
+        methods: {}
+//        watch: {
+//            '$route' (to, from) {
+//                const toDepth = to.path.split('/').length;
+//                const fromDepth = from.path.split('/').length;
+//                this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left';
+//            }
+//        }
     };
 </script>
 
 <style>
-.app-main{
-    width: 100%;
-    height: 100%;
-}
+    .app-main {
+        width: 100%;
+        height: 100%;
+    }
 </style>

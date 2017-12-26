@@ -3,9 +3,11 @@ const os = require('os');
 const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const HappyPack = require('happypack');
-var happyThreadPool = HappyPack.ThreadPool({ size: os.cpus().length });
+var happyThreadPool = HappyPack.ThreadPool({size: os.cpus().length});
 
-function resolve (dir) {
+let serverHost = "localhost";
+
+function resolve(dir) {
     return path.join(__dirname, dir);
 }
 
@@ -22,19 +24,30 @@ module.exports = {
         rules: [
             {
                 test: /\.vue$/,
-                loader: 'vue-loader',
-                options: {
-                    loaders: {
-                        less: ExtractTextPlugin.extract({
-                            use: ['css-loader?minimize', 'autoprefixer-loader', 'less-loader'],
-                            fallback: 'vue-style-loader'
-                        }),
-                        css: ExtractTextPlugin.extract({
-                            use: ['css-loader', 'autoprefixer-loader'],
-                            fallback: 'vue-style-loader'
-                        })
+                use: [
+                    {
+                        loader: 'vue-loader',
+                        options: {
+                            loaders: {
+                                less: ExtractTextPlugin.extract({
+                                    use: ['css-loader?minimize', 'autoprefixer-loader', 'less-loader'],
+                                    fallback: 'vue-style-loader'
+                                }),
+                                css: ExtractTextPlugin.extract({
+                                    use: ['css-loader', 'autoprefixer-loader'],
+                                    fallback: 'vue-style-loader'
+                                })
+                            }
+                        }
+                    },
+                    {
+                        loader: 'iview-loader',
+                        options: {
+                            prefix: true
+                        }
                     }
-                }
+                ],
+
             },
             {
                 test: /iview\/.*?js$/,
@@ -65,7 +78,14 @@ module.exports = {
                     fallback: 'style-loader'
                 }),
             },
-
+            {
+                test: /\.scss$/,
+                use: [
+                    'style-loader',
+                    'css-loader',
+                    { loader: 'sass-loader', options: { sourceMap: true } }
+                ]
+            },
             {
                 test: /\.(gif|jpg|png|woff|svg|eot|ttf)\??.*$/,
                 loader: 'url-loader?limit=1024'
@@ -75,6 +95,13 @@ module.exports = {
                 loader: 'html-loader'
             }
         ]
+    },
+    devServer: {
+        contentBase: './',
+        host: serverHost,
+        port: 9090,
+        inline: true, //可以监控js变化
+        hot: true
     },
     plugins: [
         new HappyPack({
